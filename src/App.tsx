@@ -20,7 +20,7 @@ interface ChatMessage { id: number; sender: 'spirit' | 'user'; text: string; tim
 // 通用AI调用
 async function callAI(content: string): Promise<string> {
   try {
-    const response = await fetch('https://v2.aicodee.com/v1/text/chatcompletion_v2', {
+    const response = await fetch('https://v2.aicodee.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${import.meta.env.VITE_MINIMAX_API_KEY || ''}`,
