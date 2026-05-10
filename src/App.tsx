@@ -20,14 +20,14 @@ interface ChatMessage { id: number; sender: 'spirit' | 'user'; text: string; tim
 // 通用AI调用
 async function callAI(content: string): Promise<string> {
   try {
-    const response = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
+    const response = await fetch('https://v2.aicodee.com/v1/text/chatcompletion_v2', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${import.meta.env.VITE_MINIMAX_API_KEY || ''}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'MiniMax-M2.7',
+        model: 'MiniMax-M2.7-highspeed',
         messages: [{
           role: 'user',
           content: `你是炭治郎，孜孜国际象棋AI教练（鬼灭之刃主题）。\n\n${content}\n\n请用炭治郎的语气回答，简洁（50字以内）、鼓励、友好。不要说自己是AI。`
