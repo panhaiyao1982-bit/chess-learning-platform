@@ -17,8 +17,8 @@ const SAMPLE_PUZZLES = [
 interface PuzzleState { puzzle: typeof SAMPLE_PUZZLES[0]; userMove: string | null; result: 'pending' | 'correct' | 'wrong'; step: 'view' | 'try' | 'result' }
 interface ChatMessage { id: number; sender: 'spirit' | 'user'; text: string; time: string }
 
-// 通用AI调用
-async function callAI(content: string): Promise<string> {
+// 直接调用大模型
+async function directAI(modelMessage: string): Promise<string> {
   try {
     const response = await fetch('https://v2.aicodee.com/v1/chat/completions', {
       method: 'POST',
@@ -28,35 +28,56 @@ async function callAI(content: string): Promise<string> {
       },
       body: JSON.stringify({
         model: 'MiniMax-M2.7-highspeed',
-        messages: [{
-          role: 'user',
-          content: `你是炭治郎，孜孜国际象棋AI教练（鬼灭之刃主题）。\n\n${content}\n\n请用炭治郎的语气回答，简洁（50字以内）、鼓励、友好。不要说自己是AI。`
-        }]
+        messages: [{ role: 'user', content: modelMessage }]
       })
     })
     const data = await response.json()
-    return data.choices?.[0]?.message?.content || '嗯...'
-  } catch { return '让我想想...' }
+    return data.choices?.[0]?.message?.content || ''
+  } catch { return '' }
 }
 
-// 分析棋局
-async function analyzePosition(fen: string, lastMove: string, moveCount: number): Promise<string | null> {
-  const analysisPrompt = `
-用户（孩子）刚走了一步：${lastMove}
-当前是第${Math.ceil(moveCount / 2)}回合
-局面FEN：${fen}
+// 对话（炭治郎语气）
+async function spiritChat(userMsg: string): Promise<string> {
+  const prompt = `你是炭治郎，孜孜国际象棋AI教练（鬼灭之刃主题），活泼、鼓励、简短。用户说："${userMsg}"\n请用炭治郎的语气回复，30字以内，中文。`
+  return directAI(prompt)
+}
 
-请分析这一步：
-1. 如果是好棋（开局的正常走法、吃子、将军）：简短鼓励并解释为什么好
-2. 如果是明显的失误：温和指出并建议更好的走法（不要说"错误"）
-3. 如果发现了战术机会（双射、闪击等）：提示"这里有战术！"
-4. 如果是将军或吃子：庆祝一下！
+// 棋局分析（每一步实时评论）
+async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean, isCapture: boolean, isGameOver: boolean): Promise<string> {
+  const round = Math.ceil(moveCount / 2)
+  let prompt = ''
 
-只回复分析内容，不要说"让我分析"之类的话。50字以内。
-`
-  try {
-    return await callAI(analysisPrompt)
-  } catch { return null }
+  if (isGameOver) {
+    prompt = `用户（孩子）取得胜利！走法：${lastMove}。请用炭治郎的语气热烈庆祝，20字以内，中文！`
+  } else if (isCheck) {
+    const responses = [
+      `「${lastMove}」将军了！干得漂亮！🔥`,
+      `将军！对面要头疼了 💥`,
+      `太妙了！${lastMove}这一招将军！⚔️`,
+      `「${lastMove}」！对面陷入危机！🎯`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  } else if (isCapture) {
+    const responses = [
+      `吃子！「${lastMove}」漂亮！🥳`,
+      `好棋！${lastMove}吃回一子！`,
+      `「${lastMove}」吃得好！继续加油 💪`,
+      `赞！${lastMove}缴获一子！🏆`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  } else {
+    const responses = [
+      `「${lastMove}」，这步走得好！继续 👍`,
+      `不错的步法！${lastMove}继续保持 🎌`,
+      `第${round}回合，「${lastMove}」，稳扎稳打！✨`,
+      `${lastMove}～思路清晰，继续进攻！⚔️`,
+      `「${lastMove}」！这步有想法 😊`,
+      `不错不错，${lastMove}，下一步更精彩！🌟`,
+      `第${round}回合！${lastMove}，你的棋越来越强了！💪`,
+      `「${lastMove}」～有潜力！继续探索 🔮`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
 }
 
 function App() {
@@ -77,7 +98,7 @@ function App() {
     setMessages([{
       id: Date.now(),
       sender: 'spirit',
-      text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步棋，我都会给你实时的建议和鼓励哦！',
+      text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步，我都会给你实时的建议和鼓励哦！',
       time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
     }])
     loadPuzzle(0)
@@ -91,8 +112,8 @@ function App() {
     setMessages(prev => [...prev, { id: Date.now(), sender: 'spirit', text, time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
   }
 
-  // AI 走棋
-  const makeAIMove = async () => {
+  // AI 走棋（随机）
+  const makeAIMove = () => {
     const moves = chess.moves()
     if (moves.length === 0) return
     const move = moves[Math.floor(Math.random() * moves.length)]
@@ -102,10 +123,10 @@ function App() {
     const nextColor = chess.turn() === 'w' ? '白' : '黑'
     if (chess.isCheckmate()) {
       setChessStatus(`${nextColor}棋获胜！✨`)
-      addSpiritMessage(`🎉 对局结束！${nextColor}棋获得胜利！`)
+      addSpiritMessage(`🏆 对局结束！${nextColor}棋获胜！你真棒！`)
     } else if (chess.isCheck()) {
       setChessStatus(`${nextColor}棋将军！`)
-      addSpiritMessage(`⚠️ 注意！对面正在将军！需要化解危机！`)
+      addSpiritMessage(`⚠️ ${nextColor}棋正在将军！冷静应对！`)
     } else {
       setChessStatus(`⚔️ ${nextColor}棋回合`)
     }
@@ -122,31 +143,21 @@ function App() {
           const newHistory = [...chessHistory, move.san]
           setChessHistory(newHistory)
           const nextColor = chess.turn() === 'w' ? '白' : '黑'
+          const isCheck = chess.isCheck()
+          const isCapture = move.captured !== undefined
+          const isGameOver = chess.isCheckmate()
 
-          if (chess.isCheckmate()) {
+          if (isGameOver) {
             setChessStatus(move.color === 'w' ? '✨ 白棋获胜！' : '黑棋获胜！')
-            addSpiritMessage(`🏆 太棒了！你赢了！这场对局下得真精彩！`)
-          } else if (chess.isCheck()) {
+            addSpiritMessage(`🏆 太棒了！你赢了！这盘棋下得真精彩！`)
+          } else if (isCheck) {
             setChessStatus(`${nextColor}棋将军！`)
-            // AI分析 - 将军情况
-            setIsAIThinking(true)
-            analyzePosition(chess.fen(), move.san, newHistory.length).then(analysis => {
-              if (analysis) addSpiritMessage(analysis)
-              if (!chess.isGameOver()) {
-                setTimeout(() => makeAIMove(), 600)
-              } else { setIsAIThinking(false) }
-            })
-            return true
+            analyzeMove(move.san, newHistory.length, true, false, false).then(msg => addSpiritMessage(msg))
+            if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) }
           } else {
             setChessStatus(`⚔️ ${nextColor}棋回合`)
-            // AI分析 - 普通走棋
-            setIsAIThinking(true)
-            analyzePosition(chess.fen(), move.san, newHistory.length).then(analysis => {
-              if (analysis) addSpiritMessage(analysis)
-              if (!chess.isGameOver()) {
-                setTimeout(() => makeAIMove(), 600)
-              } else { setIsAIThinking(false) }
-            })
+            analyzeMove(move.san, newHistory.length, false, isCapture, false).then(msg => addSpiritMessage(msg))
+            if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) }
           }
           return true
         }
@@ -221,8 +232,8 @@ function App() {
     setMessages(prev => [...prev, userMsg])
     setInputText('')
     setIsAIThinking(true)
-    const reply = await callAI(`用户说：${inputText}`)
-    addSpiritMessage(reply)
+    const reply = await spiritChat(inputText)
+    addSpiritMessage(reply || '让我想想...')
     setIsAIThinking(false)
   }
 
