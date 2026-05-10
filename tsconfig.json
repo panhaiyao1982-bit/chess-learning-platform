@@ -21,6 +21,5 @@
       "@assets/*": ["public/images/*"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }
