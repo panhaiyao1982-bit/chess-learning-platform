@@ -8,6 +8,14 @@ const CHESS_SPIRIT = {
   avatar: '👹'
 }
 
+// 使用说明
+const GUIDE_ITEMS = [
+  { icon: '♟️', title: '自由对局', desc: '选择白棋或黑棋，与AI下棋练习' },
+  { icon: '🎯', title: '战术题库', desc: '每天挑战5道战术题，提高棋艺' },
+  { icon: '💬', title: 'AI对话', desc: '随时向炭治郎提问，获得指导' },
+  { icon: '📊', title: '积分系统', desc: '答对获得金币，解锁更多功能' }
+]
+
 // 战术题库（从Lichess获取或本地预设）
 const SAMPLE_PUZZLES = [
   {
@@ -296,6 +304,22 @@ function App() {
             )}
           </div>
 
+          {/* 使用说明 */}
+          <div className="bg-black/30 backdrop-blur rounded-2xl p-4 mb-3">
+            <h3 className="text-white/80 text-sm font-medium mb-3">📖 使用说明</h3>
+            <div className="space-y-2">
+              {GUIDE_ITEMS.map((item, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <span className="text-base">{item.icon}</span>
+                  <div>
+                    <span className="text-white/90 text-xs font-medium">{item.title}</span>
+                    <span className="text-white/40 text-xs ml-1">{item.desc}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* 棋灵状态 */}
           <div className="bg-black/30 backdrop-blur rounded-2xl p-4">
             <div className="flex items-center gap-3">
@@ -315,18 +339,6 @@ function App() {
 
         {/* 右侧栏 - AI对话 */}
         <aside className="flex-[1] flex flex-col min-h-0">
-
-          {/* 快速功能 */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <button onClick={() => { setMode('chess'); resetGame() }} className="bg-white/5 hover:bg-white/10 text-white rounded-xl p-2.5 text-center backdrop-blur transition">
-              <div className="text-lg mb-0.5">♟️</div>
-              <div className="text-xs text-white/70">自由对局</div>
-            </button>
-            <button onClick={startPuzzle} className="bg-white/5 hover:bg-white/10 text-white rounded-xl p-2.5 text-center backdrop-blur transition">
-              <div className="text-lg mb-0.5">🎯</div>
-              <div className="text-xs text-white/70">战术题库</div>
-            </button>
-          </div>
 
           {/* AI对话区域 */}
           <div className="flex-1 flex flex-col bg-black/20 backdrop-blur rounded-2xl min-h-0">
