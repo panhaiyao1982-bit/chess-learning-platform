@@ -1,0 +1,476 @@
+{
+  "version": "1.0",
+  "project": "chess-learning-platform",
+  "description": "儿童国际象棋教学平台 - 素材清单（供多Agent协作用）",
+  "baseDir": "public/images",
+  "projectDir": "/vol2/1000/AI/ATA/素还真/chess-learning",
+  "repo": "https://github.com/panhaiyao1982-bit/chess-learning-platform",
+  "generated_at": "2026-05-10T18:35:00+08:00",
+  "status_summary": {
+    "total_assets": 78,
+    "done": 0,
+    "pending": 78,
+    "failed": 0
+  },
+  "code_status": {
+    "manifest_generated": true,
+    "project_scaffolded": true,
+    "components_generated": false,
+    "deployed": false
+  },
+  "assets": {
+
+    "characters": {
+      "mascot_queen": {
+        "id": "mascot_queen",
+        "name": "小女王琪雅",
+        "type": "character",
+        "description": "平台吉祥物，8岁活泼可爱的小女孩，头戴金色皇后皇冠，手持魔法棋杖",
+        "category": "characters",
+        "filename": "mascot_queen.png",
+        "url": "/images/characters/mascot_queen.png",
+        "prompt": "A cute cartoon chess queen character for children's learning app, little girl about 8 years old wearing an elegant golden queen crown with chess rook motifs, bright curious eyes, big friendly smile, holding a magic chess piece wand that glows with golden light, flowing dress in gradients of pink and gold, magical sparkles around her, Disney Pixar animation style, soft rounded shapes, white background, high quality, 4k",
+        "states": {
+          "happy": {
+            "filename": "mascot_queen_happy.png",
+            "prompt": "A cute cartoon chess queen character for children's learning app, little girl about 8 years old wearing an elegant golden queen crown, extremely happy expression with big smile and sparkly eyes, arms raised in celebration, golden magical sparkles, joyful atmosphere, Disney Pixar animation style, white background, high quality, 4k"
+          },
+          "thinking": {
+            "filename": "mascot_queen_thinking.png",
+            "prompt": "A cute cartoon chess queen character for children's learning app, little girl about 8 years old wearing a golden queen crown, hand on chin in thinking pose, looking curious and concentrated, magical chess pieces floating around her, soft pastel colors, Disney Pixar animation style, white background, high quality, 4k"
+          },
+          "explaining": {
+            "filename": "mascot_queen_explaining.png",
+            "prompt": "A cute cartoon chess queen character for children's learning app, little girl about 8 years old wearing a golden queen crown, pointing finger up as if explaining something, big confident smile, magical whiteboard or chess board behind her with glowing pieces, Disney Pixar animation style, white background, high quality, 4k"
+          },
+          "celebrating": {
+            "filename": "mascot_queen_celebrating.png",
+            "prompt": "A cute cartoon chess queen character for children's learning app, little girl about 8 years old wearing a golden queen crown, jumping with joy, confetti and stars around her, huge happy expression, victory celebration pose, golden sparkles everywhere, Disney Pixar animation style, white background, high quality, 4k"
+          }
+        },
+        "status": "pending",
+        "priority": "high",
+        "used_in": ["lesson_intro", "ai_explanation", "achievement_reward", "homepage"]
+      },
+      "mascot_knight": {
+        "id": "mascot_knight",
+        "name": "骑士阿塔",
+        "type": "character",
+        "description": "琪雅的伙伴，勇敢的小骑士，头戴战盔，手持小盾牌",
+        "category": "characters",
+        "filename": "mascot_knight.png",
+        "url": "/images/characters/mascot_knight.png",
+        "prompt": "A cute cartoon chess knight character for children's learning app, small brave boy about 9 years old wearing a golden knight helmet shaped like a chess knight piece, holding a tiny silver shield, determined but friendly expression, blue and silver armor with soft rounded shapes, a small white horse companion beside him, Disney Pixar animation style, white background, high quality, 4k",
+        "states": {
+          "ready": {
+            "filename": "mascot_knight_ready.png",
+            "prompt": "A cute cartoon chess knight character for children's learning app, small brave boy wearing a golden knight helmet shaped like a chess knight, holding a silver shield in ready position, determined confident smile, blue and silver armor, small white horse beside him, dynamic pose, Disney Pixar animation style, white background, high quality, 4k"
+          },
+          "protecting": {
+            "filename": "mascot_knight_protecting.png",
+            "prompt": "A cute cartoon chess knight character for children's learning app, small brave boy wearing a golden knight helmet, standing in front with shield raised protectively, brave expression, blue silver armor, small white horse behind him, magical glow around shield, Disney Pixar animation style, white background, high quality, 4k"
+          },
+          "proud": {
+            "filename": "mascot_knight_proud.png",
+            "prompt": "A cute cartoon chess knight character for children's learning app, small brave boy wearing a golden knight helmet, standing with hand on chest proudly, big confident smile, blue and silver armor gleaming, small white horse beside him, stars and sparkles around, Disney Pixar animation style, white background, high quality, 4k"
+          }
+        },
+        "status": "pending",
+        "priority": "high",
+        "used_in": ["tactics_tips", "ai_practice_tips", "lesson_transition"]
+      }
+    },
+
+    "lesson_covers": {
+      "lesson_L1_cover": {
+        "id": "lesson_L1_cover",
+        "name": "第一课：认识国际象棋",
+        "category": "lessons",
+        "filename": "lesson_L1_cover.png",
+        "url": "/images/lessons/lesson_L1_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a giant magical chessboard in a enchanted forest clearing, friendly cartoon chess pieces having a joyful party on the board, a cute little girl queen character waving hello in the center, bright green trees and colorful flowers around, floating magical chess pieces with sparkles, golden sunshine, storybook illustration style, warm and inviting atmosphere, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "lesson_L2_cover": {
+        "id": "lesson_L2_cover",
+        "name": "第二课：吃子与对杀",
+        "category": "lessons",
+        "filename": "lesson_L2_cover.png",
+        "url": "/images/lessons/lesson_L2_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a magical forest with giant chess pieces having a playful chase game, cute cartoon pawns running around, a wise old tree teaching chess moves, bright colors, magical sparkles, adventurous atmosphere, storybook style for kids, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L3_cover": {
+        "id": "lesson_L3_cover",
+        "name": "第三课：基础杀法",
+        "category": "lessons",
+        "filename": "lesson_L3_cover.png",
+        "url": "/images/lessons/lesson_L3_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a magical castle throne room with chess pieces performing a dramatic checkmate scene, a queen piece giving a gold medal to a brave pawn, confetti and celebration, warm royal colors purple and gold, magical sparkles, storybook style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L4_cover": {
+        "id": "lesson_L4_cover",
+        "name": "第四课：开局基础",
+        "category": "lessons",
+        "filename": "lesson_L4_cover.png",
+        "url": "/images/lessons/lesson_L4_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a magical chess academy classroom with chess pieces sitting at tiny desks, a wise owl teaching from a chalkboard with opening patterns, bright sunshine through windows, colorful books and magical scrolls, cozy learning atmosphere, storybook style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L5_cover": {
+        "id": "lesson_L5_cover",
+        "name": "第五课：基础战术",
+        "category": "lessons",
+        "filename": "lesson_L5_cover.png",
+        "url": "/images/lessons/lesson_L5_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a magical battlefield with chess pieces performing tactical moves, arrows showing double attacks, knights jumping dramatically, magical explosions of light showing tactics, cartoon war banners flying, exciting adventurous style, storybook illustration, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L6_cover": {
+        "id": "lesson_L6_cover",
+        "name": "第六课：残局基础",
+        "category": "lessons",
+        "filename": "lesson_L6_cover.png",
+        "url": "/images/lessons/lesson_L6_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a peaceful starlit night scene with chess pieces on a giant endgame board, a wise owl sitting on a moon explaining endgame techniques, gentle glowing stars and peaceful atmosphere, soft blue and purple colors, magical dreamlike quality, storybook style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L7_cover": {
+        "id": "lesson_L7_cover",
+        "name": "第七课：中局策略",
+        "category": "lessons",
+        "filename": "lesson_L7_cover.png",
+        "url": "/images/lessons/lesson_L7_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a grand chess tournament arena with chess pieces competing, flags and banners from different kingdoms, excited crowd of tiny chess piece spectators, spotlight on a dramatic middle game position, energetic and exciting atmosphere, storybook style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "lesson_L8_cover": {
+        "id": "lesson_L8_cover",
+        "name": "第八课：综合实战",
+        "category": "lessons",
+        "filename": "lesson_L8_cover.png",
+        "url": "/images/lessons/lesson_L8_cover.png",
+        "prompt": "A colorful cartoon illustration for children's chess lesson cover, a grand championship stadium with colorful bunting and flags, a proud young chess champion holding a huge golden trophy, confetti raining down, happy crowd cheering, magical fireworks in the sky, triumphant victorious atmosphere, storybook style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      }
+    },
+
+    "chess_pieces_cartoon": {
+      "white_king": {
+        "id": "white_king",
+        "name": "白方国王（卡通）",
+        "category": "pieces",
+        "filename": "white_king.png",
+        "url": "/images/pieces/white_king.png",
+        "prompt": "A cute cartoon chess king character for children's app, adorable king wearing a golden crown, big friendly eyes, chubby round body in silver and gold armor, holding a golden scepter, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "white_queen": {
+        "id": "white_queen",
+        "name": "白方皇后（卡通）",
+        "category": "pieces",
+        "filename": "white_queen.png",
+        "url": "/images/pieces/white_queen.png",
+        "prompt": "A cute cartoon chess queen character for children's app, adorable girl wearing an elegant golden crown with jewels, big bright eyes, flowing pink and gold dress, holding a magic wand, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "white_rook": {
+        "id": "white_rook",
+        "name": "白方城堡（卡通）",
+        "category": "pieces",
+        "filename": "white_rook.png",
+        "url": "/images/pieces/white_rook.png",
+        "prompt": "A cute cartoon chess rook character for children's app, adorable round tower character with a tiny helmet, big friendly smile, solid and dependable look, white and silver colors, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "white_bishop": {
+        "id": "white_bishop",
+        "name": "白方主教（卡通）",
+        "category": "pieces",
+        "filename": "white_bishop.png",
+        "url": "/images/pieces/white_bishop.png",
+        "prompt": "A cute cartoon chess bishop character for children's app, adorable round bishop wearing a tall miter hat, big gentle eyes, holding a wooden staff, white and gold robes, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "white_knight": {
+        "id": "white_knight",
+        "name": "白方骑士（卡通）",
+        "category": "pieces",
+        "filename": "white_knight.png",
+        "url": "/images/pieces/white_knight.png",
+        "prompt": "A cute cartoon chess knight character for children's app, adorable horse head shaped character wearing a tiny helmet, big brave eyes, silver and white armor, holding a small lance, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "white_pawn": {
+        "id": "white_pawn",
+        "name": "白方小兵（卡通）",
+        "category": "pieces",
+        "filename": "white_pawn.png",
+        "url": "/images/pieces/white_pawn.png",
+        "prompt": "A cute cartoon chess pawn character for children's app, adorable round little soldier with a tiny helmet, big curious eyes, small but determined expression, white and silver outfit, soft rounded Disney Pixar style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_king": {
+        "id": "black_king",
+        "name": "黑方国王（卡通）",
+        "category": "pieces",
+        "filename": "black_king.png",
+        "url": "/images/pieces/black_king.png",
+        "prompt": "A cute cartoon chess king character for children's app, adorable king wearing a dark crown with purple jewels, big friendly eyes, chubby round body in dark silver armor, holding a dark golden scepter, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_queen": {
+        "id": "black_queen",
+        "name": "黑方皇后（卡通）",
+        "category": "pieces",
+        "filename": "black_queen.png",
+        "url": "/images/pieces/black_queen.png",
+        "prompt": "A cute cartoon chess queen character for children's app, adorable girl wearing an elegant dark crown with purple jewels, big bright eyes, flowing dark purple and gold dress, holding a magic wand, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_rook": {
+        "id": "black_rook",
+        "name": "黑方城堡（卡通）",
+        "category": "pieces",
+        "filename": "black_rook.png",
+        "url": "/images/pieces/black_rook.png",
+        "prompt": "A cute cartoon chess rook character for children's app, adorable round tower character with a tiny dark helmet, big friendly smile, solid and dependable look, dark gray and black colors, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_bishop": {
+        "id": "black_bishop",
+        "name": "黑方主教（卡通）",
+        "category": "pieces",
+        "filename": "black_bishop.png",
+        "url": "/images/pieces/black_bishop.png",
+        "prompt": "A cute cartoon chess bishop character for children's app, adorable round bishop wearing a tall dark miter hat, big gentle eyes, holding a wooden staff, dark purple and black robes, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_knight": {
+        "id": "black_knight",
+        "name": "黑方骑士（卡通）",
+        "category": "pieces",
+        "filename": "black_knight.png",
+        "url": "/images/pieces/black_knight.png",
+        "prompt": "A cute cartoon chess knight character for children's app, adorable horse head shaped character wearing a tiny dark helmet, big brave eyes, dark gray and black armor, holding a small lance, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "black_pawn": {
+        "id": "black_pawn",
+        "name": "黑方小兵（卡通）",
+        "category": "pieces",
+        "filename": "black_pawn.png",
+        "url": "/images/pieces/black_pawn.png",
+        "prompt": "A cute cartoon chess pawn character for children's app, adorable round little soldier with a tiny dark helmet, big curious eyes, small but determined expression, dark gray and black outfit, soft rounded Disney Pixar style, dark gray background, high quality, 4k",
+        "status": "pending",
+        "priority": "high"
+      }
+    },
+
+    "tactics_illustrations": {
+      "tactic_double_attack": {
+        "id": "tactic_double_attack",
+        "name": "双射战术示意图",
+        "category": "tactics",
+        "filename": "tactic_double_attack.png",
+        "url": "/images/tactics/tactic_double_attack.png",
+        "prompt": "A clear educational cartoon chess tactics diagram for children, showing a chessboard with a white queen piece glowing and shooting two magical golden arrows simultaneously attacking two black pieces, the concept of double attack explained with friendly arrows and sparkles, soft educational colors, white background, includes a cute speech bubble saying 'Two targets at once!', clean and simple style perfect for kids, high quality illustration, 4k",
+        "status": "pending",
+        "priority": "high"
+      },
+      "tactic_pin": {
+        "id": "tactic_pin",
+        "name": "牵制战术示意图",
+        "category": "tactics",
+        "filename": "tactic_pin.png",
+        "url": "/images/tactics/tactic_pin.png",
+        "prompt": "A clear educational cartoon chess tactics diagram for children, showing a chessboard with a white rook laser-beaming a black piece, an arrow showing the king behind it is pinned and cannot move, friendly explanation with a cute locked symbol, soft educational colors, white background, speech bubble 'The king is pinned!', clean style for kids, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "tactic_fork": {
+        "id": "tactic_fork",
+        "name": "闪击战术示意图",
+        "category": "tactics",
+        "filename": "tactic_fork.png",
+        "url": "/images/tactics/tactic_fork.png",
+        "prompt": "A clear educational cartoon chess tactics diagram for children, showing a chessboard with a white knight jumping dramatically and splitting to attack two black pieces at once, magical leap trail showing the knight's path, soft educational colors, white background, speech bubble 'Knight attacks two at once!', fun dynamic style for kids, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "tactic_skewer": {
+        "id": "tactic_skewer",
+        "name": "引离战术示意图",
+        "category": "tactics",
+        "filename": "tactic_skewer.png",
+        "url": "/images/tactics/tactic_skewer.png",
+        "prompt": "A clear educational cartoon chess tactics diagram for children, showing a chessboard with a white queen pushing a black king forward with a powerful attack, revealing a black queen behind it that can now be captured, magical arrow showing the kick, soft educational colors, white background, speech bubble 'Push the king, lose the queen!', fun style for kids, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "tactic_discovered": {
+        "id": "tactic_discovered",
+        "name": "闪躲战术示意图",
+        "category": "tactics",
+        "filename": "tactic_discovered.png",
+        "url": "/images/tactics/tactic_discovered.png",
+        "prompt": "A clear educational cartoon chess tactics diagram for children, showing a chessboard with a white bishop moving aside to reveal a laser attack from a white rook behind it hitting a black piece, magical reveal effect with sparkles, soft educational colors, white background, speech bubble 'Hidden attack revealed!', fun educational style for kids, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      }
+    },
+
+    "achievement_badges": {
+      "badge_first_win": {
+        "id": "badge_first_win",
+        "name": "首胜徽章",
+        "category": "badges",
+        "filename": "badge_first_win.png",
+        "url": "/images/badges/badge_first_win.png",
+        "prompt": "A cute cartoon achievement badge for children's chess app, golden star trophy with a chess king on top, sparkles and confetti around, red ribbon banner below saying 'First Victory', soft 3D glossy style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "badge_7day_streak": {
+        "id": "badge_7day_streak",
+        "name": "坚持7天徽章",
+        "category": "badges",
+        "filename": "badge_7day_streak.png",
+        "url": "/images/badges/badge_7day_streak.png",
+        "prompt": "A cute cartoon achievement badge for children's chess app, a golden calendar with the number 7 on it, tiny chess pieces marching across like a streak, sparkle effects, rainbow colors around, red ribbon banner saying '7 Day Streak', soft 3D glossy style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "badge_tactics_master": {
+        "id": "badge_tactics_master",
+        "name": "战术大师徽章",
+        "category": "badges",
+        "filename": "badge_tactics_master.png",
+        "url": "/images/badges/badge_tactics_master.png",
+        "prompt": "A cute cartoon achievement badge for children's chess app, a golden shield with a chess knight emblem on it, crossed swords behind, magical sparkle aura, purple and gold colors, red ribbon banner saying 'Tactics Master', soft 3D glossy style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "badge_first_lessons": {
+        "id": "badge_first_lessons",
+        "name": "完成第一课徽章",
+        "category": "badges",
+        "filename": "badge_first_lessons.png",
+        "url": "/images/badges/badge_first_lessons.png",
+        "prompt": "A cute cartoon achievement badge for children's chess app, a golden book opening with chess pieces dancing out, sparkles of knowledge, blue and gold colors, red ribbon banner saying 'First Lesson', soft 3D glossy style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "badge_chess_champion": {
+        "id": "badge_chess_champion",
+        "name": "象棋冠军徽章",
+        "category": "badges",
+        "filename": "badge_chess_champion.png",
+        "url": "/images/badges/badge_chess_champion.png",
+        "prompt": "A cute cartoon achievement badge for children's chess app, a huge golden trophy with a chess queen on top, surrounded by stars and sparkles, rainbow light rays, red ribbon banner saying 'Chess Champion', soft 3D glossy style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      }
+    },
+
+    "ui_illustrations": {
+      "ui_empty_progress": {
+        "id": "ui_empty_progress",
+        "name": "空状态插图（无进度）",
+        "category": "ui",
+        "filename": "ui_empty_progress.png",
+        "url": "/images/ui/ui_empty_progress.png",
+        "prompt": "A cute cartoon illustration showing a sad little chess pawn sitting alone on an empty bookshelf, soft blue and gray colors, warm encouraging atmosphere, tiny sparkles suggesting hope, storybook style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "low"
+      },
+      "ui_loading": {
+        "id": "ui_loading",
+        "name": "加载中插图",
+        "category": "ui",
+        "filename": "ui_loading.png",
+        "url": "/images/ui/ui_loading.png",
+        "prompt": "A cute cartoon illustration of two friendly chess pieces a knight and queen having tea together while waiting, a magical hourglass with sparkles running, cozy warm colors, playful and relaxing atmosphere, storybook style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "low"
+      },
+      "ui_error": {
+        "id": "ui_error",
+        "name": "错误提示插图",
+        "category": "ui",
+        "filename": "ui_error.png",
+        "url": "/images/ui/ui_error.png",
+        "prompt": "A cute cartoon illustration of a confused little chess pawn scratching its head with question marks floating around, gentle encouraging expression despite error, soft orange and warm colors, storybook style, white background, high quality, 4k",
+        "status": "pending",
+        "priority": "low"
+      }
+    },
+
+    "backgrounds": {
+      "bg_royal_palace": {
+        "id": "bg_royal_palace",
+        "name": "王宫主题背景",
+        "category": "backgrounds",
+        "filename": "bg_royal_palace.png",
+        "url": "/images/backgrounds/bg_royal_palace.png",
+        "prompt": "A beautiful magical royal palace interior cartoon background for children's chess game, grand hall with a giant chess board floor pattern, floating candles in purple and gold, magical sparkles, warm inviting atmosphere, soft illustration style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "bg_enchanted_forest": {
+        "id": "bg_enchanted_forest",
+        "name": "魔法森林背景",
+        "category": "backgrounds",
+        "filename": "bg_enchanted_forest.png",
+        "url": "/images/backgrounds/bg_enchanted_forest.png",
+        "prompt": "A magical enchanted forest cartoon background for children's chess game, giant chess pieces hidden among colorful mushrooms and flowers, soft green and golden light filtering through trees, tiny magical creatures, warm cozy atmosphere, storybook illustration style, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "bg_starry_night": {
+        "id": "bg_starry_night",
+        "name": "星空夜景背景",
+        "category": "backgrounds",
+        "filename": "bg_starry_night.png",
+        "url": "/images/backgrounds/bg_starry_night.png",
+        "prompt": "A beautiful starlit night sky cartoon background for children's chess game, a giant glowing chess board floating among the stars, soft purple and blue colors, gentle twinkling stars, peaceful magical atmosphere, dreamy and cozy feeling, high quality, 4k",
+        "status": "pending",
+        "priority": "medium"
+      }
+    }
+  },
+
+  "naming_convention": {
+    "filename": "全小写，下划线分隔，如 mascot_queen_happy.png",
+    "id": "类型_描述，如 mascot_queen、lesson_L1_cover",
+    "category": "characters/lessons/pieces/tactics/badges/ui/backgrounds",
+    "url": "以斜杠开头，如 /images/characters/mascot_queen.png"
+  },
+
+  "coordination_rules": {
+    "生图Agent": "读取 pending 状态的条目 → 生成图片 → 保存到 baseDir/category/filename → 更新 status=done",
+    "代码Agent": "只读取 status=done 的条目 → 直接引用 url 字段 → 生成 TypeScript 代码",
+    "禁止": "代码Agent不得引用pending状态的资源",
+    "异常处理": "失败的条目 status=failed，协调者决定重试或跳过"
+  }
+}
