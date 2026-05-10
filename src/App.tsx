@@ -78,9 +78,7 @@ async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean
     return responses[Math.floor(Math.random() * responses.length)]
   }
 }
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-}
+
 
 function App() {
   const [chess] = useState(new Chess())
