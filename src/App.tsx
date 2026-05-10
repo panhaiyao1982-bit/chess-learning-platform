@@ -45,10 +45,9 @@ async function spiritChat(userMsg: string): Promise<string> {
 // 棋局分析（每一步实时评论）
 async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean, isCapture: boolean, isGameOver: boolean): Promise<string> {
   const round = Math.ceil(moveCount / 2)
-  let prompt = ''
 
   if (isGameOver) {
-    prompt = `用户（孩子）取得胜利！走法：${lastMove}。请用炭治郎的语气热烈庆祝，20字以内，中文！`
+    return [`🎉 太棒了！「${lastMove}」锁定胜局！🏆`, `🏆 胜利！最后一步「${lastMove}」完美！✨`, `✨ 赢啦！${lastMove}这一招绝了！🔥`][Math.floor(Math.random() * 3)]
   } else if (isCheck) {
     const responses = [
       `「${lastMove}」将军了！干得漂亮！🔥`,
@@ -76,6 +75,9 @@ async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean
       `第${round}回合！${lastMove}，你的棋越来越强了！💪`,
       `「${lastMove}」～有潜力！继续探索 🔮`
     ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
+}
     return responses[Math.floor(Math.random() * responses.length)]
   }
 }
