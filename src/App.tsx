@@ -252,87 +252,115 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
-      <header className="flex items-center justify-center py-3 px-4 bg-black/20 backdrop-blur">
-        <h1 className="text-2xl font-bold text-white tracking-wide">⚔️ 孜孜的国际象棋AI教练</h1>
+      <header className="flex items-center justify-center py-3 px-4 bg-black/20 backdrop-blur flex-shrink-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide">⚔️ 孜孜国际象棋AI教练</h1>
       </header>
 
-      <main className="flex-1 flex gap-0 p-4 min-h-0">
-        {/* 棋盘区域 */}
-        <section className="flex-[3] flex flex-col items-center justify-center gap-4">
-          <div className="flex items-center gap-3">
-            <button onClick={goToChess} className={`px-4 py-2 rounded-xl text-sm font-medium transition ${mode === 'chess' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>♟️ 自由对局</button>
-            <button onClick={goToPuzzle} className={`px-4 py-2 rounded-xl text-sm font-medium transition ${mode === 'puzzle' ? 'bg-red-500/80 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>🎯 战术题库</button>
+      <main className="flex-1 flex gap-3 sm:gap-4 p-3 sm:p-4 min-h-0">
+        {/* 左侧：棋盘 + 控制区 */}
+        <section className="flex-[3_1_0%] flex flex-col items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button onClick={goToChess} className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition ${mode === 'chess' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>♟️ 自由对局</button>
+            <button onClick={goToPuzzle} className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition ${mode === 'puzzle' ? 'bg-red-500/80 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>🎯 战术题库</button>
           </div>
 
-          <div className="bg-black/30 backdrop-blur rounded-xl px-4 py-2 text-center">
-            <span className="text-white/80 text-sm">{currentStatus}</span>
+          <div className="bg-black/30 backdrop-blur rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 text-center">
+            <span className="text-white/80 text-xs sm:text-sm">{currentStatus}</span>
           </div>
 
           <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-2 ring-white/10">
-            <Chessboard position={chessFen} onPieceDrop={onDrop} boardWidth={Math.min(500, window.innerWidth * 0.52)} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
+            <Chessboard
+              position={chessFen}
+              onPieceDrop={onDrop}
+              boardWidth={Math.min(Math.min(480, window.innerWidth * 0.5), 500)}
+              boardOrientation="white"
+              customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }}
+              customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
+            />
           </div>
 
-          <div className="flex gap-3">
-            {mode === 'chess' && <button onClick={resetChess} className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm backdrop-blur transition">🔄 重新开局</button>}
-            {mode === 'puzzle' && puzzleState?.result === 'correct' && <button onClick={nextPuzzle} className="px-5 py-2.5 bg-red-500/80 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition">📖 下一题</button>}
+          <div className="flex gap-2 sm:gap-3">
+            {mode === 'chess' && <button onClick={resetChess} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm backdrop-blur transition">🔄 重新开局</button>}
+            {mode === 'puzzle' && puzzleState?.result === 'correct' && <button onClick={nextPuzzle} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-red-500/80 hover:bg-red-600 text-white rounded-xl text-xs sm:text-sm font-medium transition">📖 下一题</button>}
           </div>
 
+          {/* 走法记录（内嵌在棋盘区下方，可滚动） */}
           {mode === 'chess' && chessHistory.length > 0 && (
-            <div className="bg-black/20 backdrop-blur rounded-xl p-3 max-w-md w-full">
+            <div className="w-full max-w-md bg-black/20 backdrop-blur rounded-xl p-2 sm:p-3">
               <h3 className="text-white/70 text-xs mb-2">📜 走法记录</h3>
-              <div className="flex flex-wrap gap-1 text-xs">
-                {chessHistory.map((move, i) => (<span key={i} className="bg-white/10 text-white/90 px-2 py-0.5 rounded">{Math.floor(i / 2) + 1}.{i % 2 === 0 ? '' : '..'}{move}</span>))}
+              <div className="flex flex-wrap gap-1 text-xs max-h-24 overflow-y-auto">
+                {chessHistory.map((move, i) => (<span key={i} className="bg-white/10 text-white/90 px-1.5 py-0.5 rounded">{Math.floor(i / 2) + 1}.{i % 2 === 0 ? '' : '..'}{move}</span>))}
               </div>
             </div>
           )}
         </section>
 
-        {/* 中间栏 */}
-        <section className="flex-[1.2] flex flex-col min-h-0 mx-4">
-          <div className="bg-black/30 backdrop-blur rounded-2xl p-4 mb-3 flex-1 flex flex-col min-h-0">
-            <h3 className="text-white/80 text-sm font-medium mb-3">{mode === 'puzzle' ? '📋 题目' : '📜 走法记录'}</h3>
+        {/* 中间栏：信息面板 */}
+        <section className="flex-[1.5_1_0%] flex flex-col gap-2 sm:gap-3 min-h-0 overflow-y-auto">
+          <div className="bg-black/30 backdrop-blur rounded-2xl p-3 sm:p-4 flex-shrink-0">
+            <h3 className="text-white/80 text-sm font-medium mb-2 sm:mb-3">{mode === 'puzzle' ? '📋 题目' : '📜 走法记录'}</h3>
             {mode === 'puzzle' ? (
-              <div className="flex-1">
-                <div className="text-center py-4"><div className="text-3xl font-bold text-white mb-1">{puzzleScore.correct}/{puzzleScore.total}</div><p className="text-white/40 text-xs">正确/总计</p></div>
-                {puzzleState && puzzleState.result !== 'pending' && (<div className={`mt-3 p-3 rounded-xl text-sm ${puzzleState.result === 'correct' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{puzzleState.result === 'correct' ? '✅ 正确！' : '❌ 再想想'}{puzzleState.userMove && <span className="ml-2">你的走法：{puzzleState.userMove}</span>}</div>)}
+              <div>
+                <div className="text-center py-3 sm:py-4"><div className="text-2xl sm:text-3xl font-bold text-white mb-1">{puzzleScore.correct}/{puzzleScore.total}</div><p className="text-white/40 text-xs">正确/总计</p></div>
+                {puzzleState && puzzleState.result !== 'pending' && (<div className={`mt-2 sm:mt-3 p-2 sm:p-3 rounded-xl text-xs sm:text-sm ${puzzleState.result === 'correct' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>{puzzleState.result === 'correct' ? '✅ 正确！' : '❌ 再想想'}{puzzleState.userMove && <span className="ml-2">你的走法：{puzzleState.userMove}</span>}</div>)}
               </div>
-            ) : chessHistory.length === 0 ? (<div className="flex-1 flex items-center justify-center"><p className="text-white/30 text-xs">开始下棋，我会给你实时指导！</p></div>) : (
-              <div className="flex-1 overflow-y-auto"><div className="grid grid-cols-2 gap-1">{chessHistory.map((move, i) => (<span key={i} className={`text-xs px-2 py-1 rounded ${i % 2 === 0 ? 'bg-white/5 text-white/60' : 'bg-white/10 text-white'}`}>{Math.floor(i / 2) + 1}.{move}</span>))}</div></div>
+            ) : chessHistory.length === 0 ? (<p className="text-white/30 text-xs text-center py-2">开始下棋，我会给你实时指导！</p>) : (
+              <div className="max-h-32 sm:max-h-40 overflow-y-auto"><div className="grid grid-cols-2 gap-1">{chessHistory.map((move, i) => (<span key={i} className={`text-xs px-2 py-1 rounded ${i % 2 === 0 ? 'bg-white/5 text-white/60' : 'bg-white/10 text-white'}`}>{Math.floor(i / 2) + 1}.{move}</span>))}</div></div>
             )}
           </div>
 
-          <div className="bg-black/30 backdrop-blur rounded-2xl p-4 mb-3">
-            <h3 className="text-white/80 text-sm font-medium mb-3">📖 使用说明</h3>
-            <div className="space-y-2">{GUIDE_ITEMS.map((item, i) => (<div key={i} className="flex items-center gap-2.5"><span className="text-base">{item.icon}</span><div><span className="text-white/90 text-xs font-medium">{item.title}</span><span className="text-white/40 text-xs ml-1">{item.desc}</span></div></div>))}</div>
+          <div className="bg-black/30 backdrop-blur rounded-2xl p-3 sm:p-4 flex-shrink-0">
+            <h3 className="text-white/80 text-sm font-medium mb-2 sm:mb-3">📖 使用说明</h3>
+            <div className="space-y-1.5 sm:space-y-2">{GUIDE_ITEMS.map((item, i) => (<div key={i} className="flex items-center gap-2"><span className="text-base">{item.icon}</span><div><span className="text-white/90 text-xs font-medium">{item.title}</span><span className="text-white/40 text-xs ml-1">{item.desc}</span></div></div>))}</div>
           </div>
 
-          <div className="bg-black/30 backdrop-blur rounded-2xl p-4">
+          <div className="bg-black/30 backdrop-blur rounded-2xl p-3 sm:p-4 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-xl shadow-lg">{CHESS_SPIRIT.avatar}</div>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-lg sm:text-xl shadow-lg">{CHESS_SPIRIT.avatar}</div>
               <div><h2 className="text-white font-bold text-sm">炭治郎 <span className="text-xs text-red-300">♟️棋灵</span></h2><p className="text-white/40 text-xs">{mode === 'puzzle' ? `📊 ${puzzleScore.correct}/${puzzleScore.total}` : isAIThinking ? '🤔 分析中...' : chessStatus}</p></div>
             </div>
             <div className="mt-2 h-px bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
           </div>
         </section>
 
-        {/* 右侧栏 - AI对话 */}
-        <aside className="flex-[1] flex flex-col min-h-0">
+        {/* 右侧栏：AI对话（固定高度，内部滚动） */}
+        <aside className="flex-[1.2_1_0%] flex flex-col min-h-0">
           <div className="flex-1 flex flex-col bg-black/20 backdrop-blur rounded-2xl min-h-0">
-            <div className="px-4 py-2.5 border-b border-white/5"><h3 className="text-white/80 text-sm font-medium">💬 与炭治郎对话</h3></div>
-            <div ref={chatRef} className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
-              {messages.map(msg => (<div key={msg.id} className={`flex ${msg.sender === 'spirit' ? 'justify-start' : 'justify-end'}`}><div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${msg.sender === 'spirit' ? 'bg-white/10 text-white/90' : 'bg-red-500/70 text-white'}`}><p className="leading-relaxed">{msg.text}</p><p className={`text-[10px] mt-1 ${msg.sender === 'spirit' ? 'text-white/40' : 'text-white/60'}`}>{msg.time}</p></div></div>))}
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-white/5 flex-shrink-0">
+              <h3 className="text-white/80 text-sm font-medium">💬 与炭治郎对话</h3>
             </div>
-            <div className="p-3 border-t border-white/5">
+            <div ref={chatRef} className="flex-1 min-h-0 overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
+              {messages.map(msg => (
+                <div key={msg.id} className={`flex ${msg.sender === 'spirit' ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs sm:text-sm ${msg.sender === 'spirit' ? 'bg-white/10 text-white/90' : 'bg-red-500/70 text-white'}`}>
+                    <p className="leading-relaxed">{msg.text}</p>
+                    <p className={`text-[10px] mt-1 ${msg.sender === 'spirit' ? 'text-white/40' : 'text-white/60'}`}>{msg.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-2 sm:p-3 border-t border-white/5 flex-shrink-0">
               <div className="flex gap-2">
-                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="问炭治郎任何问题..." className="flex-1 bg-white/10 text-white text-sm placeholder-white/30 rounded-xl px-3 py-2 outline-none" />
-                <button onClick={handleSend} disabled={isAIThinking} className="px-3 py-2 bg-red-500 hover:bg-red-600 disabled:bg-red-500/50 text-white rounded-xl text-sm font-medium transition">发送</button>
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={e => setInputText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  placeholder="问炭治郎任何问题..."
+                  className="flex-1 bg-white/10 text-white text-xs sm:text-sm placeholder-white/30 rounded-xl px-3 py-2 outline-none focus:bg-white/15 transition"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={isAIThinking}
+                  className="px-3 py-2 bg-red-500 hover:bg-red-600 disabled:bg-red-500/50 text-white rounded-xl text-xs sm:text-sm font-medium transition flex-shrink-0"
+                >发送</button>
               </div>
             </div>
           </div>
         </aside>
       </main>
 
-      <footer className="text-center py-2 text-white/30 text-xs">⚔️ 孜孜国际象棋AI教练 · 鬼灭之刃主题 · 棋灵炭治郎</footer>
+      <footer className="text-center py-1.5 sm:py-2 text-white/30 text-[10px] sm:text-xs flex-shrink-0">⚔️ 孜孜国际象棋AI教练 · 鬼灭之刃主题 · 棋灵炭治郎</footer>
     </div>
   )
 }
