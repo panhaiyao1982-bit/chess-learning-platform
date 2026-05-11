@@ -18,13 +18,9 @@ async function directAI(modelMessage: string): Promise<string> {
         'Authorization': `Bearer ${import.meta.env.VITE_MINIMAX_API_KEY || ''}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7-highspeed',
-        messages: [{ role: 'user', content: modelMessage }]
-      })
+      body: JSON.stringify({ model: 'MiniMax-M2.7-highspeed', messages: [{ role: 'user', content: modelMessage }] })
     })
-    const data = await response.json()
-    return data.choices?.[0]?.message?.content || ''
+    return response.json().then(d => d.choices?.[0]?.message?.content || '')
   } catch { return '' }
 }
 
@@ -35,18 +31,11 @@ async function spiritChat(userMsg: string): Promise<string> {
 
 async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean, isCapture: boolean, isGameOver: boolean): Promise<string> {
   const round = Math.ceil(moveCount / 2)
-  if (isGameOver) {
-    return [`🎉 太棒了！「${lastMove}」锁定胜局！🏆`, `🏆 胜利！最后一步「${lastMove}」完美！✨`, `✨ 赢啦！${lastMove}这一招绝了！🔥`][Math.floor(Math.random() * 3)]
-  } else if (isCheck) {
-    const responses = [`「${lastMove}」将军了！干得漂亮！🔥`, `将军！对面要头疼了 💥`, `太妙了！${lastMove}这一招将军！⚔️`, `「${lastMove}」！对面陷入危机！🎯`]
-    return responses[Math.floor(Math.random() * responses.length)]
-  } else if (isCapture) {
-    const responses = [`吃子！「${lastMove}」漂亮！🥳`, `好棋！${lastMove}吃回一子！`, `「${lastMove}」吃得好！继续加油 💪`, `赞！${lastMove}缴获一子！🏆`]
-    return responses[Math.floor(Math.random() * responses.length)]
-  } else {
-    const responses = [`「${lastMove}」，这步走得好！继续 👍`, `不错的步法！${lastMove}继续保持 🎌`, `第${round}回合，「${lastMove}」，稳扎稳打！✨`, `${lastMove}～思路清晰，继续进攻！⚔️`, `「${lastMove}」！这步有想法 😊`, `不错不错，${lastMove}，下一步更精彩！🌟`, `第${round}回合！${lastMove}，你的棋越来越强了！💪`, `「${lastMove}」～有潜力！继续探索 🔮`]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
+  if (isGameOver) return [`🎉 太棒了！「${lastMove}」锁定胜局！🏆`, `🏆 胜利！最后一步「${lastMove}」完美！✨`, `✨ 赢啦！${lastMove}这一招绝了！🔥`][Math.floor(Math.random() * 3)]
+  if (isCheck) { const r = [`「${lastMove}」将军了！干得漂亮！🔥`, `将军！对面要头疼了 💥`, `太妙了！${lastMove}这一招将军！⚔️`, `「${lastMove}」！对面陷入危机！🎯`]; return r[Math.floor(Math.random() * r.length)] }
+  if (isCapture) { const r = [`吃子！「${lastMove}」漂亮！🥳`, `好棋！${lastMove}吃回一子！`, `「${lastMove}」吃得好！继续加油 💪`, `赞！${lastMove}缴获一子！🏆`]; return r[Math.floor(Math.random() * r.length)] }
+  const responses = [`「${lastMove}」，这步走得好！继续 👍`, `不错的步法！${lastMove}继续保持 🎌`, `第${round}回合，「${lastMove}」，稳扎稳打！✨`, `${lastMove}～思路清晰，继续进攻！⚔️`, `「${lastMove}」！这步有想法 😊`, `不错不错，${lastMove}，下一步更精彩！🌟`, `第${round}回合！${lastMove}，你的棋越来越强了！💪`, `「${lastMove}」～有潜力！继续探索 🔮`]
+  return responses[Math.floor(Math.random() * responses.length)]
 }
 
 function App() {
@@ -70,21 +59,14 @@ function App() {
     loadPuzzle(0)
   }, [])
 
-  // 动态计算棋盘区高度，用于同步侧栏高度
   useEffect(() => {
-    const measure = () => {
-      if (boardWrapRef.current) {
-        setBoardAreaH(boardWrapRef.current.offsetHeight)
-      }
-    }
+    const measure = () => { if (boardWrapRef.current) setBoardAreaH(boardWrapRef.current.offsetHeight) }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
   }, [])
 
-  useEffect(() => {
-    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight
-  }, [messages])
+  useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight }, [messages])
 
   const addSpiritMessage = (text: string) => {
     setMessages(prev => [...prev, { id: Date.now(), sender: 'spirit', text, time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
@@ -149,37 +131,22 @@ function App() {
 
   return (
     <div className="app-container">
-      <header className="app-header"><h1>⚔️ 孜孜国际象棋AI教练</h1></header>
+      <header className="app-header">
+        <h1 className="app-title">⚔️ 孜孜国际象棋AI教练</h1>
+        <div className="nav-tabs">
+          {mode === 'chess' && <button onClick={resetChess} className="nav-btn nav-reset">🔄 重新开局</button>}
+          <button onClick={goToChess} className={`nav-btn ${mode === 'chess' ? 'nav-active' : ''}`}>♟️ 自由对局</button>
+          <button onClick={goToPuzzle} className={`nav-btn ${mode === 'puzzle' ? 'nav-active' : ''}`}>🎯 战术题库</button>
+          <span className="nav-status">{currentStatus}</span>
+        </div>
+      </header>
+
       <div className="app-body">
-
-        {/* 左：棋盘+控制 */}
+        {/* 左：棋盘 */}
         <div className="left-panel">
-          {/* 第一行：重新开局 + 自由对局 + 战术题库 */}
-          <div className="mode-tabs">
-            {mode === 'chess' && (
-              <button onClick={resetChess} className="btn-reset">🔄 重新开局</button>
-            )}
-            <button onClick={goToChess} className={mode === 'chess' ? 'tab-active' : 'tab'}>♟️ 自由对局</button>
-            <button onClick={goToPuzzle} className={mode === 'puzzle' ? 'tab-active' : 'tab'}>🎯 战术题库</button>
-          </div>
-
-          <div className="status-bar">{currentStatus}</div>
-
-          {/* 棋盘（测量高度用ref） */}
           <div className="board-wrap" ref={boardWrapRef}>
             <Chessboard position={chessFen} onPieceDrop={onDrop} boardWidth={boardW} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
           </div>
-
-          {/* 炭治郎头像+状态 */}
-          <div className="spirit-card">
-            <div className="spirit-avatar">👹</div>
-            <div className="spirit-info">
-              <div className="spirit-name">炭治郎 <span className="spirit-tag">♟️棋灵</span></div>
-              <div className="spirit-status">{mode === 'puzzle' ? `📊 ${puzzleScore.correct}/${puzzleScore.total}` : isAIThinking ? '🤔 分析中...' : chessStatus}</div>
-            </div>
-          </div>
-
-          {/* 下一题按钮（仅战术题库模式，棋盘下方） */}
           {mode === 'puzzle' && puzzleState?.result === 'correct' && (
             <button onClick={nextPuzzle} className="btn-primary">📖 下一题</button>
           )}
@@ -231,8 +198,8 @@ function App() {
             )}
           </div>
         </div>
-
       </div>
+
       <footer className="app-footer">⚔️ 孜孜国际象棋AI教练 · 鬼灭之刃主题 · 棋灵炭治郎</footer>
     </div>
   )
