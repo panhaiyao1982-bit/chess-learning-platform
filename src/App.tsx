@@ -2,12 +2,11 @@ import { Chess } from 'chess.js'
 import { useState, useEffect, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 
-const CHESS_SPIRIT = { name: '炭治郎', avatar: '👹' }
 const GUIDE_ITEMS = [
-  { icon: '♟️', title: '自由对局', desc: '与AI下棋练习，AI会自动回应' },
-  { icon: '🎯', title: '战术题库', desc: '每天挑战战术题，提高棋艺' },
-  { icon: '💬', title: 'AI对话', desc: '向炭治郎提问，获得指导' },
-  { icon: '📊', title: '积分系统', desc: '答对获得金币，解锁功能' }
+  { icon: '♟️', title: '自由对局', desc: '与AI下棋练习' },
+  { icon: '🎯', title: '战术题库', desc: '每天挑战战术题' },
+  { icon: '💬', title: 'AI对话', desc: '向炭治郎提问' },
+  { icon: '📊', title: '积分系统', desc: '答对获得金币' }
 ]
 const SAMPLE_PUZZLES = [
   { id: 1, fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', moves: ['Qf3'], theme: '双射', rating: 800, hint: '白棋先走，有什么战术？' },
@@ -17,7 +16,6 @@ const SAMPLE_PUZZLES = [
 interface PuzzleState { puzzle: typeof SAMPLE_PUZZLES[0]; userMove: string | null; result: 'pending' | 'correct' | 'wrong'; step: 'view' | 'try' | 'result' }
 interface ChatMessage { id: number; sender: 'spirit' | 'user'; text: string; time: string }
 
-// 直接调用大模型
 async function directAI(modelMessage: string): Promise<string> {
   try {
     const response = await fetch('https://v2.aicodee.com/v1/chat/completions', {
@@ -36,48 +34,26 @@ async function directAI(modelMessage: string): Promise<string> {
   } catch { return '' }
 }
 
-// 对话（炭治郎语气）
 async function spiritChat(userMsg: string): Promise<string> {
   const prompt = `你是炭治郎，孜孜国际象棋AI教练（鬼灭之刃主题），活泼、鼓励、简短。用户说："${userMsg}"\n请用炭治郎的语气回复，30字以内，中文。`
   return directAI(prompt)
 }
 
-// 棋局分析（每一步实时评论）
 async function analyzeMove(lastMove: string, moveCount: number, isCheck: boolean, isCapture: boolean, isGameOver: boolean): Promise<string> {
   const round = Math.ceil(moveCount / 2)
   if (isGameOver) {
     return [`🎉 太棒了！「${lastMove}」锁定胜局！🏆`, `🏆 胜利！最后一步「${lastMove}」完美！✨`, `✨ 赢啦！${lastMove}这一招绝了！🔥`][Math.floor(Math.random() * 3)]
   } else if (isCheck) {
-    const responses = [
-      `「${lastMove}」将军了！干得漂亮！🔥`,
-      `将军！对面要头疼了 💥`,
-      `太妙了！${lastMove}这一招将军！⚔️`,
-      `「${lastMove}」！对面陷入危机！🎯`
-    ]
+    const responses = [`「${lastMove}」将军了！干得漂亮！🔥`, `将军！对面要头疼了 💥`, `太妙了！${lastMove}这一招将军！⚔️`, `「${lastMove}」！对面陷入危机！🎯`]
     return responses[Math.floor(Math.random() * responses.length)]
   } else if (isCapture) {
-    const responses = [
-      `吃子！「${lastMove}」漂亮！🥳`,
-      `好棋！${lastMove}吃回一子！`,
-      `「${lastMove}」吃得好！继续加油 💪`,
-      `赞！${lastMove}缴获一子！🏆`
-    ]
+    const responses = [`吃子！「${lastMove}」漂亮！🥳`, `好棋！${lastMove}吃回一子！`, `「${lastMove}」吃得好！继续加油 💪`, `赞！${lastMove}缴获一子！🏆`]
     return responses[Math.floor(Math.random() * responses.length)]
   } else {
-    const responses = [
-      `「${lastMove}」，这步走得好！继续 👍`,
-      `不错的步法！${lastMove}继续保持 🎌`,
-      `第${round}回合，「${lastMove}」，稳扎稳打！✨`,
-      `${lastMove}～思路清晰，继续进攻！⚔️`,
-      `「${lastMove}」！这步有想法 😊`,
-      `不错不错，${lastMove}，下一步更精彩！🌟`,
-      `第${round}回合！${lastMove}，你的棋越来越强了！💪`,
-      `「${lastMove}」～有潜力！继续探索 🔮`
-    ]
+    const responses = [`「${lastMove}」，这步走得好！继续 👍`, `不错的步法！${lastMove}继续保持 🎌`, `第${round}回合，「${lastMove}」，稳扎稳打！✨`, `${lastMove}～思路清晰，继续进攻！⚔️`, `「${lastMove}」！这步有想法 😊`, `不错不错，${lastMove}，下一步更精彩！🌟`, `第${round}回合！${lastMove}，你的棋越来越强了！💪`, `「${lastMove}」～有潜力！继续探索 🔮`]
     return responses[Math.floor(Math.random() * responses.length)]
   }
 }
-
 
 function App() {
   const [chess] = useState(new Chess())
@@ -94,12 +70,7 @@ function App() {
   const chatRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setMessages([{
-      id: Date.now(),
-      sender: 'spirit',
-      text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步，我都会给你实时的建议和鼓励哦！',
-      time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-    }])
+    setMessages([{ id: Date.now(), sender: 'spirit', text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步，我都会给你实时的建议和鼓励哦！', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
     loadPuzzle(0)
   }, [])
 
@@ -119,15 +90,9 @@ function App() {
     setChessFen(chess.fen())
     setChessHistory(prev => [...prev, move])
     const nextColor = chess.turn() === 'w' ? '白' : '黑'
-    if (chess.isCheckmate()) {
-      setChessStatus(`${nextColor}棋获胜！✨`)
-      addSpiritMessage(`🏆 对局结束！${nextColor}棋获胜！你真棒！`)
-    } else if (chess.isCheck()) {
-      setChessStatus(`${nextColor}棋将军！`)
-      addSpiritMessage(`⚠️ ${nextColor}棋正在将军！冷静应对！`)
-    } else {
-      setChessStatus(`⚔️ ${nextColor}棋回合`)
-    }
+    if (chess.isCheckmate()) { setChessStatus(`${nextColor}棋获胜！✨`); addSpiritMessage(`🏆 对局结束！${nextColor}棋获胜！你真棒！`) }
+    else if (chess.isCheck()) { setChessStatus(`${nextColor}棋将军！`); addSpiritMessage(`⚠️ ${nextColor}棋正在将军！冷静应对！`) }
+    else { setChessStatus(`⚔️ ${nextColor}棋回合`) }
     setIsAIThinking(false)
   }
 
@@ -140,21 +105,10 @@ function App() {
           const newHistory = [...chessHistory, move.san]
           setChessHistory(newHistory)
           const nextColor = chess.turn() === 'w' ? '白' : '黑'
-          const isCheck = chess.isCheck()
-          const isCapture = move.captured !== undefined
-          const isGameOver = chess.isCheckmate()
-          if (isGameOver) {
-            setChessStatus(move.color === 'w' ? '✨ 白棋获胜！' : '黑棋获胜！')
-            addSpiritMessage(`🏆 太棒了！你赢了！这盘棋下得真精彩！`)
-          } else if (isCheck) {
-            setChessStatus(`${nextColor}棋将军！`)
-            analyzeMove(move.san, newHistory.length, true, false, false).then(msg => addSpiritMessage(msg))
-            if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) }
-          } else {
-            setChessStatus(`⚔️ ${nextColor}棋回合`)
-            analyzeMove(move.san, newHistory.length, false, isCapture, false).then(msg => addSpiritMessage(msg))
-            if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) }
-          }
+          const isCheck = chess.isCheck(); const isCapture = move.captured !== undefined; const isGameOver = chess.isCheckmate()
+          if (isGameOver) { setChessStatus(move.color === 'w' ? '✨ 白棋获胜！' : '黑棋获胜！'); addSpiritMessage(`🏆 太棒了！你赢了！这盘棋下得真精彩！`) }
+          else if (isCheck) { setChessStatus(`${nextColor}棋将军！`); analyzeMove(move.san, newHistory.length, true, false, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) } }
+          else { setChessStatus(`⚔️ ${nextColor}棋回合`); analyzeMove(move.san, newHistory.length, false, isCapture, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) } }
           return true
         }
       } catch { return false }
@@ -165,15 +119,8 @@ function App() {
         if (move) {
           setChessFen(chess.fen())
           const isCorrect = puzzleState.puzzle.moves.includes(move.san)
-          if (isCorrect) {
-            setPuzzleState(prev => prev ? { ...prev, result: 'correct', step: 'result', userMove: move.san } : null)
-            setPuzzleScore(prev => ({ correct: prev.correct + 1, total: prev.total + 1 }))
-            addSpiritMessage(`🎉 正确！「${move.san}」这道${puzzleState.puzzle.theme}题你解出来了！`)
-          } else {
-            setPuzzleState(prev => prev ? { ...prev, result: 'wrong', step: 'result', userMove: move.san } : null)
-            setPuzzleScore(prev => ({ ...prev, total: prev.total + 1 }))
-            addSpiritMessage(`💡 不对哦，你的「${move.san}」不是最佳走法。再想想？提示：${puzzleState.puzzle.hint}`)
-          }
+          if (isCorrect) { setPuzzleState(prev => prev ? { ...prev, result: 'correct', step: 'result', userMove: move.san } : null); setPuzzleScore(prev => ({ correct: prev.correct + 1, total: prev.total + 1 })); addSpiritMessage(`🎉 正确！「${move.san}」这道${puzzleState.puzzle.theme}题你解出来了！`) }
+          else { setPuzzleState(prev => prev ? { ...prev, result: 'wrong', step: 'result', userMove: move.san } : null); setPuzzleScore(prev => ({ ...prev, total: prev.total + 1 })); addSpiritMessage(`💡 不对哦，你的「${move.san}」不是最佳走法。再想想？提示：${puzzleState.puzzle.hint}`) }
           return true
         }
       } catch { return false }
@@ -182,222 +129,99 @@ function App() {
     return false
   }
 
-  const loadPuzzle = (index: number) => {
-    chess.reset()
-    const puzzle = SAMPLE_PUZZLES[index % SAMPLE_PUZZLES.length]
-    chess.load(puzzle.fen)
-    setChessFen(puzzle.fen)
-    setPuzzleState({ puzzle, userMove: null, result: 'pending', step: 'view' })
-  }
+  const loadPuzzle = (index: number) => { chess.reset(); const puzzle = SAMPLE_PUZZLES[index % SAMPLE_PUZZLES.length]; chess.load(puzzle.fen); setChessFen(puzzle.fen); setPuzzleState({ puzzle, userMove: null, result: 'pending', step: 'view' }) }
+  const goToChess = () => { if (mode === 'chess') return; const lastSaved = localStorage.getItem('chessGameState'); if (lastSaved) { try { const state = JSON.parse(lastSaved); chess.load(state.fen); setChessFen(state.fen); setChessHistory(state.history); setChessStatus(state.status) } catch { /* ignore */ } }; setMode('chess') }
+  const goToPuzzle = () => { if (mode === 'puzzle') return; localStorage.setItem('chessGameState', JSON.stringify({ fen: chess.fen(), history: chessHistory, status: chessStatus })); setMode('puzzle'); loadPuzzle(puzzleIndex); setPuzzleScore({ correct: 0, total: 0 }); addSpiritMessage(`🎯 战术题库模式！ 当前题目：${SAMPLE_PUZZLES[puzzleIndex].theme}（难度${SAMPLE_PUZZLES[puzzleIndex].rating}）`) }
+  const nextPuzzle = () => { const next = (puzzleIndex + 1) % SAMPLE_PUZZLES.length; setPuzzleIndex(next); loadPuzzle(next); setPuzzleState(prev => prev ? { ...prev, step: 'try', result: 'pending', userMove: null } : null); addSpiritMessage(`📖 第${next + 1}题：${SAMPLE_PUZZLES[next].hint}`) }
+  const handleSend = async () => { if (!inputText.trim()) return; const userMsg: ChatMessage = { id: Date.now(), sender: 'user', text: inputText.trim(), time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }; setMessages(prev => [...prev, userMsg]); setInputText(''); setIsAIThinking(true); const reply = await spiritChat(inputText); addSpiritMessage(reply || '让我想想...'); setIsAIThinking(false) }
+  const resetChess = () => { chess.reset(); setChessFen(chess.fen()); setChessHistory([]); setChessStatus('⚔️ 执白先行'); localStorage.removeItem('chessGameState'); addSpiritMessage('🔄 对局已重新开始！加油！') }
 
-  const goToChess = () => {
-    if (mode === 'chess') return
-    const lastSaved = localStorage.getItem('chessGameState')
-    if (lastSaved) {
-      try {
-        const state = JSON.parse(lastSaved)
-        chess.load(state.fen)
-        setChessFen(state.fen)
-        setChessHistory(state.history)
-        setChessStatus(state.status)
-      } catch { /* ignore */ }
-    }
-    setMode('chess')
-  }
-
-  const goToPuzzle = () => {
-    if (mode === 'puzzle') return
-    localStorage.setItem('chessGameState', JSON.stringify({ fen: chess.fen(), history: chessHistory, status: chessStatus }))
-    setMode('puzzle')
-    loadPuzzle(puzzleIndex)
-    setPuzzleScore({ correct: 0, total: 0 })
-    addSpiritMessage(`🎯 战术题库模式！ 当前题目：${SAMPLE_PUZZLES[puzzleIndex].theme}（难度${SAMPLE_PUZZLES[puzzleIndex].rating}）`)
-  }
-
-  const nextPuzzle = () => {
-    const next = (puzzleIndex + 1) % SAMPLE_PUZZLES.length
-    setPuzzleIndex(next)
-    loadPuzzle(next)
-    setPuzzleState(prev => prev ? { ...prev, step: 'try', result: 'pending', userMove: null } : null)
-    addSpiritMessage(`📖 第${next + 1}题：${SAMPLE_PUZZLES[next].hint}`)
-  }
-
-  const handleSend = async () => {
-    if (!inputText.trim()) return
-    const userMsg: ChatMessage = { id: Date.now(), sender: 'user', text: inputText.trim(), time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }
-    setMessages(prev => [...prev, userMsg])
-    setInputText('')
-    setIsAIThinking(true)
-    const reply = await spiritChat(inputText)
-    addSpiritMessage(reply || '让我想想...')
-    setIsAIThinking(false)
-  }
-
-  const resetChess = () => {
-    chess.reset()
-    setChessFen(chess.fen())
-    setChessHistory([])
-    setChessStatus('⚔️ 执白先行')
-    localStorage.removeItem('chessGameState')
-    addSpiritMessage('🔄 对局已重新开始！加油！')
-  }
-
-  const currentStatus = mode === 'puzzle'
-    ? (puzzleState ? `🎯 ${puzzleState.puzzle.theme} · ${puzzleState.puzzle.rating}` : '')
-    : (isAIThinking ? '🤔 炭治郎思考中...' : chessStatus)
-
-  // 计算棋盘宽度：自适应屏幕
+  const currentStatus = mode === 'puzzle' ? (puzzleState ? `🎯 ${puzzleState.puzzle.theme} · ${puzzleState.puzzle.rating}` : '') : (isAIThinking ? '🤔 炭治郎思考中...' : chessStatus)
   const boardW = typeof window !== 'undefined' ? Math.min(Math.max(window.innerWidth * 0.36, 220), 480) : 400
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
+    <div className="app-container">
+      <header className="app-header"><h1>⚔️ 孜孜国际象棋AI教练</h1></header>
+      <div className="app-body">
 
-      {/* 顶部标题栏 */}
-      <header className="flex items-center justify-center py-2 px-4 bg-black/20 backdrop-blur flex-shrink-0">
-        <h1 className="text-base sm:text-xl font-bold text-white tracking-wide">⚔️ 孜孜国际象棋AI教练</h1>
-      </header>
-
-      {/* 主体：三栏布局 */}
-      {/* 👈 左：棋盘+控制 | 💬 中：对话+输入 | 📜 右：走法记录 */}
-      <main className="flex-1 min-h-0 flex gap-2 sm:gap-3 p-2 sm:p-3">
-
-        {/* 左栏：棋盘 + 控制按钮 */}
-        <section className="flex flex-col items-center gap-2 sm:gap-3 w-[calc(50%-2.5rem)] sm:w-[calc(50%-1rem)] flex-shrink-0">
-          {/* 模式切换 */}
-          <div className="flex gap-2">
-            <button onClick={goToChess} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${mode === 'chess' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>♟️ 自由对局</button>
-            <button onClick={goToPuzzle} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${mode === 'puzzle' ? 'bg-red-500/80 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>🎯 战术题库</button>
+        {/* 左：棋盘+控制 */}
+        <div className="left-panel">
+          <div className="mode-tabs">
+            <button onClick={goToChess} className={mode === 'chess' ? 'tab-active' : 'tab'}>♟️ 自由对局</button>
+            <button onClick={goToPuzzle} className={mode === 'puzzle' ? 'tab-active' : 'tab'}>🎯 战术题库</button>
           </div>
-
-          {/* 状态 */}
-          <div className="bg-black/30 backdrop-blur rounded-lg px-3 py-1 text-center">
-            <span className="text-white/80 text-xs">{currentStatus}</span>
+          <div className="status-bar">{currentStatus}</div>
+          <div className="board-wrap">
+            <Chessboard position={chessFen} onPieceDrop={onDrop} boardWidth={boardW} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
           </div>
-
-          {/* 棋盘 */}
-          <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
-            <Chessboard
-              position={chessFen}
-              onPieceDrop={onDrop}
-              boardWidth={boardW}
-              boardOrientation="white"
-              customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }}
-              customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
-            />
+          <div className="action-btns">
+            {mode === 'chess' && <button onClick={resetChess} className="btn-secondary">🔄 重新开局</button>}
+            {mode === 'puzzle' && puzzleState?.result === 'correct' && <button onClick={nextPuzzle} className="btn-primary">📖 下一题</button>}
           </div>
-
-          {/* 操作按钮 */}
-          <div className="flex gap-2">
-            {mode === 'chess' && <button onClick={resetChess} className="px-4 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs backdrop-blur transition">🔄 重新开局</button>}
-            {mode === 'puzzle' && puzzleState?.result === 'correct' && <button onClick={nextPuzzle} className="px-4 py-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-xs font-medium transition">📖 下一题</button>}
-          </div>
-
-          {/* 炭治郎头像+状态 */}
-          <div className="bg-black/30 backdrop-blur rounded-xl p-3 w-full max-w-[var(--board-w)]">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-base shadow-lg flex-shrink-0">{CHESS_SPIRIT.avatar}</div>
-              <div>
-                <h2 className="text-white font-bold text-xs">炭治郎 <span className="text-red-300 text-[10px]">♟️棋灵</span></h2>
-                <p className="text-white/40 text-[10px]">{mode === 'puzzle' ? `📊 ${puzzleScore.correct}/${puzzleScore.total}` : isAIThinking ? '🤔 分析中...' : chessStatus}</p>
-              </div>
+          <div className="spirit-card">
+            <div className="spirit-avatar">👹</div>
+            <div className="spirit-info">
+              <div className="spirit-name">炭治郎 <span className="spirit-tag">♟️棋灵</span></div>
+              <div className="spirit-status">{mode === 'puzzle' ? `📊 ${puzzleScore.correct}/${puzzleScore.total}` : isAIThinking ? '🤔 分析中...' : chessStatus}</div>
             </div>
           </div>
-
-          {/* 使用说明 */}
-          <div className="bg-black/30 backdrop-blur rounded-xl p-2 w-full max-w-[var(--board-w)]">
-            <h3 className="text-white/70 text-xs mb-1.5 font-medium">📖 使用说明</h3>
-            <div className="space-y-1">{GUIDE_ITEMS.map((item, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <span className="text-xs">{item.icon}</span>
-                <span className="text-white/90 text-[10px] font-medium">{item.title}</span>
-                <span className="text-white/40 text-[10px]">{item.desc}</span>
-              </div>
-            ))}</div>
+          <div className="guide-card">
+            <div className="guide-title">📖 使用说明</div>
+            {GUIDE_ITEMS.map((item, i) => (
+              <div key={i} className="guide-item"><span className="guide-icon">{item.icon}</span><span className="guide-name">{item.title}</span><span className="guide-desc">{item.desc}</span></div>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* 中栏：AI对话 + 输入（可滚动） */}
-        <section className="flex-1 min-h-0 flex flex-col bg-black/20 backdrop-blur rounded-2xl">
-          {/* 标题 */}
-          <div className="px-3 py-2 border-b border-white/10 flex-shrink-0">
-            <h3 className="text-white/80 text-sm font-medium flex items-center gap-1.5">
-              <span>💬</span>
-              <span>与炭治郎对话</span>
-            </h3>
-          </div>
-          {/* 对话消息（内部滚动） */}
-          <div ref={chatRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-2">
+        {/* 中：AI对话 */}
+        <div className="center-panel">
+          <div className="panel-header">💬 与炭治郎对话</div>
+          <div className="chat-messages" ref={chatRef}>
             {messages.map(msg => (
-              <div key={msg.id} className={`flex ${msg.sender === 'spirit' ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[85%] rounded-2xl px-3 py-1.5 text-xs ${msg.sender === 'spirit' ? 'bg-white/10 text-white/90' : 'bg-red-500/70 text-white'}`}>
-                  <p className="leading-relaxed">{msg.text}</p>
-                  <p className={`text-[9px] mt-0.5 ${msg.sender === 'spirit' ? 'text-white/40' : 'text-white/60'}`}>{msg.time}</p>
+              <div key={msg.id} className={`msg-wrap ${msg.sender === 'spirit' ? 'msg-left' : 'msg-right'}`}>
+                <div className={`msg-bubble ${msg.sender === 'spirit' ? 'msg-spirit' : 'msg-user'}`}>
+                  <p className="msg-text">{msg.text}</p>
+                  <p className="msg-time">{msg.time}</p>
                 </div>
               </div>
             ))}
           </div>
-          {/* 输入框（固定在底部） */}
-          <div className="p-2 border-t border-white/10 flex-shrink-0">
-            <div className="flex gap-1.5">
-              <input
-                type="text"
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSend()}
-                placeholder="问炭治郎任何问题..."
-                className="flex-1 bg-white/10 text-white text-xs placeholder-white/30 rounded-xl px-3 py-1.5 outline-none focus:bg-white/15 transition"
-              />
-              <button
-                onClick={handleSend}
-                disabled={isAIThinking}
-                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 disabled:bg-red-500/50 text-white rounded-xl text-xs font-medium transition flex-shrink-0"
-              >发送</button>
-            </div>
+          <div className="chat-input-bar">
+            <input className="chat-input" type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="问炭治郎任何问题..." />
+            <button className="send-btn" onClick={handleSend} disabled={isAIThinking}>发送</button>
           </div>
-        </section>
+        </div>
 
-        {/* 右栏：走法记录（内部滚动） */}
-        <aside className="w-32 sm:w-40 flex-shrink-0 flex flex-col bg-black/20 backdrop-blur rounded-2xl min-h-0">
-          <div className="px-3 py-2 border-b border-white/10 flex-shrink-0">
-            <h3 className="text-white/80 text-sm font-medium">📜 走法记录</h3>
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto px-2 py-2">
+        {/* 右：走法记录 */}
+        <div className="right-panel">
+          <div className="panel-header">📜 走法记录</div>
+          <div className="record-body">
             {mode === 'puzzle' ? (
               <div>
-                <div className="text-center py-3">
-                  <div className="text-2xl font-bold text-white mb-0.5">{puzzleScore.correct}/{puzzleScore.total}</div>
-                  <p className="text-white/40 text-[10px]">正确/总计</p>
-                </div>
+                <div className="puzzle-score"><div className="score-num">{puzzleScore.correct}/{puzzleScore.total}</div><div className="score-label">正确/总计</div></div>
                 {puzzleState && puzzleState.result !== 'pending' && (
-                  <div className={`mt-2 p-2 rounded-lg text-xs ${puzzleState.result === 'correct' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                  <div className={`result-badge ${puzzleState.result === 'correct' ? 'correct' : 'wrong'}`}>
                     {puzzleState.result === 'correct' ? '✅ 正确！' : '❌ 再想想'}
-                    {puzzleState.userMove && <div className="text-[10px] mt-0.5">你的：{puzzleState.userMove}</div>}
+                    {puzzleState.userMove && <div className="user-move">你的：{puzzleState.userMove}</div>}
                   </div>
                 )}
-                {puzzleState && (
-                  <div className="mt-2 text-center text-white/30 text-[10px]">{puzzleState.puzzle.hint}</div>
-                )}
+                {puzzleState && <div className="puzzle-hint">{puzzleState.puzzle.hint}</div>}
               </div>
             ) : chessHistory.length === 0 ? (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-white/30 text-xs text-center">开始下棋<br />我会实时指导！</p>
-              </div>
+              <div className="record-empty">开始下棋<br />我会实时指导！</div>
             ) : (
-              <div className="space-y-0.5">
-                {chessHistory.map((move, i) => (
-                  <div key={i} className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded ${i % 2 === 0 ? 'bg-white/5 text-white/50' : 'bg-white/10 text-white/90'}`}>
-                    <span className="text-white/30 text-[10px] w-4">{Math.floor(i / 2) + 1}.</span>
-                    <span>{move}</span>
-                  </div>
-                ))}
-              </div>
+              <div className="move-list">{chessHistory.map((move, i) => (
+                <div key={i} className={`move-row ${i % 2 === 0 ? 'even' : 'odd'}`}>
+                  <span className="move-num">{Math.floor(i / 2) + 1}.</span>
+                  <span className="move-san">{move}</span>
+                </div>
+              ))}</div>
             )}
           </div>
-        </aside>
+        </div>
 
-      </main>
-
-      <footer className="text-center py-1 text-white/20 text-[10px] flex-shrink-0">⚔️ 孜孜国际象棋AI教练 · 鬼灭之刃主题 · 棋灵炭治郎</footer>
+      </div>
+      <footer className="app-footer">⚔️ 孜孜国际象棋AI教练 · 鬼灭之刃主题 · 棋灵炭治郎</footer>
     </div>
   )
 }

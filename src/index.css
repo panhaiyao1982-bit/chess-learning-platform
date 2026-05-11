@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-primary: #6366f1;
-  --color-secondary: #f472b6;
-  --color-accent: #fbbf24;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
@@ -14,6 +14,435 @@ html, body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+/* === 主布局 === */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #58187a 100%);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.app-body {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  gap: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 4px;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.15);
+}
+
+/* === 左栏：棋盘+控制 === */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 46%;
+  flex-shrink: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 4px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tab, .tab-active {
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.tab {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.5);
+}
+
+.tab:hover { background: rgba(255,255,255,0.12); }
+
+.tab-active {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.status-bar {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 4px 14px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.75rem;
+}
+
+.board-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  ring: 1px solid rgba(255,255,255,0.1);
+}
+
+.action-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: rgba(239,68,68,0.85);
+  color: #fff;
+}
+
+.btn-primary:hover { background: rgba(239,68,68,1); }
+
+.btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.btn-secondary:hover { background: rgba(255,255,255,0.18); }
+
+.spirit-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.spirit-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.spirit-info { flex: 1; }
+
+.spirit-name {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.spirit-tag {
+  color: #fca5a5;
+  font-size: 0.65rem;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.spirit-status {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+  margin-top: 2px;
+}
+
+.guide-card {
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.guide-title {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.guide-icon { font-size: 0.8rem; }
+
+.guide-name {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.guide-desc {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+}
+
+/* === 中栏：AI对话 === */
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 8px 12px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.msg-wrap {
+  display: flex;
+}
+
+.msg-left { justify-content: flex-start; }
+.msg-right { justify-content: flex-end; }
+
+.msg-bubble {
+  max-width: 82%;
+  border-radius: 14px;
+  padding: 7px 10px;
+  font-size: 0.75rem;
+}
+
+.msg-spirit {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+}
+
+.msg-user {
+  background: rgba(239,68,68,0.75);
+  color: #fff;
+}
+
+.msg-text {
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.msg-time {
+  font-size: 0.6rem;
+  margin-top: 3px;
+  opacity: 0.5;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.chat-input {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.75rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.chat-input::placeholder { color: rgba(255,255,255,0.3); }
+.chat-input:focus { background: rgba(255,255,255,0.15); }
+
+.send-btn {
+  padding: 7px 14px;
+  background: rgba(239,68,68,0.9);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.send-btn:hover:not(:disabled) { background: rgba(239,68,68,1); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* === 右栏：走法记录 === */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  width: 130px;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.record-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.record-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.7rem;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.puzzle-score {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.score-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.score-label {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+  margin-top: 2px;
+}
+
+.result-badge {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  margin-top: 6px;
+}
+
+.result-badge.correct {
+  background: rgba(34,197,94,0.2);
+  color: #86efac;
+}
+
+.result-badge.wrong {
+  background: rgba(239,68,68,0.2);
+  color: #fca5a5;
+}
+
+.user-move {
+  font-size: 0.6rem;
+  margin-top: 3px;
+  opacity: 0.8;
+}
+
+.puzzle-hint {
+  margin-top: 8px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.65rem;
+}
+
+.move-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.move-row {
+  display: flex;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+}
+
+.move-row.even {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+}
+
+.move-row.odd {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+}
+
+.move-num {
+  width: 22px;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+
+.move-san { flex: 1; }
+
+/* === 滚动条美化 === */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
