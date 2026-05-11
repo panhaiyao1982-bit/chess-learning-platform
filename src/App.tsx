@@ -10,6 +10,55 @@ const SAMPLE_PUZZLES = [
 interface PuzzleState { puzzle: typeof SAMPLE_PUZZLES[0]; userMove: string | null; result: 'pending' | 'correct' | 'wrong'; step: 'view' | 'try' | 'result' }
 interface ChatMessage { id: number; sender: 'spirit' | 'user'; text: string; time: string }
 
+// 加载 Stockfish（从全局 script 标签注入）
+declare const Stockfish: () => any
+let stockfishInstance: any = null
+
+async function loadStockfish(): Promise<any> {
+  if (stockfishInstance) return stockfishInstance
+  try {
+    // 等待 Stockfish 初始化完成
+    await new Promise<void>((resolve) => {
+      const handler = (msg: string) => {
+        if (msg === 'uciok' || msg === 'readyok') {
+          stockfishInstance.removeMessageListener(handler)
+          resolve()
+        }
+      }
+      stockfishInstance = Stockfish()
+      stockfishInstance.addMessageListener(handler)
+      stockfishInstance.postMessage('uci')
+      stockfishInstance.postMessage('isready')
+    })
+    return stockfishInstance
+  } catch (e) {
+    console.warn('Stockfish 加载失败:', e)
+    return null
+  }
+}
+
+// 设置 AI 难度（skill level 0-20）
+function setStockfishSkill(sf: any, level: number) {
+  if (!sf) return
+  sf.postMessage(`setoption name Skill Level value ${level}`)
+  sf.postMessage(`setoption name MultiPV value 1`)
+}
+
+// 获取最佳走法
+function getBestMove(sf: any, fen: string, callback: (move: string) => void) {
+  if (!sf) return
+  const handler = (line: string) => {
+    const m = line.match(/^bestmove\s+(\S+)/)
+    if (m) {
+      sf.removeMessageListener(handler)
+      callback(m[1])
+    }
+  }
+  sf.addMessageListener(handler)
+  sf.postMessage(`position fen ${fen}`)
+  sf.postMessage(`go depth 12`)
+}
+
 async function directAI(modelMessage: string): Promise<string> {
   try {
     const response = await fetch('https://v2.aicodee.com/v1/chat/completions', {
@@ -50,13 +99,23 @@ function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputText, setInputText] = useState('')
   const [isAIThinking, setIsAIThinking] = useState(false)
+  const [sf, setSf] = useState<any>(null)
   const chatRef = useRef<HTMLDivElement>(null)
   const boardWrapRef = useRef<HTMLDivElement>(null)
   const [boardAreaH, setBoardAreaH] = useState(400)
+  const [aiSkill, setAiSkill] = useState(10) // 默认10级
 
   useEffect(() => {
     setMessages([{ id: Date.now(), sender: 'spirit', text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步，我都会给你实时的建议和鼓励哦！', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
     loadPuzzle(0)
+    // 异步加载 Stockfish
+    loadStockfish().then(instance => {
+      if (instance) {
+        setSf(instance)
+        setStockfishSkill(instance, aiSkill)
+        addSpiritMessage('🔍 Stockfish AI 引擎已就绪！')
+      }
+    })
   }, [])
 
   useEffect(() => {
@@ -72,18 +131,42 @@ function App() {
     setMessages(prev => [...prev, { id: Date.now(), sender: 'spirit', text, time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
   }
 
+  // AI 走棋（Stockfish）
   const makeAIMove = () => {
-    const moves = chess.moves()
-    if (moves.length === 0) return
-    const move = moves[Math.floor(Math.random() * moves.length)]
-    chess.move(move)
-    setChessFen(chess.fen())
-    setChessHistory(prev => [...prev, move])
-    const nextColor = chess.turn() === 'w' ? '白' : '黑'
-    if (chess.isCheckmate()) { setChessStatus(`${nextColor}棋获胜！✨`); addSpiritMessage(`🏆 对局结束！${nextColor}棋获胜！你真棒！`) }
-    else if (chess.isCheck()) { setChessStatus(`${nextColor}棋将军！`); addSpiritMessage(`⚠️ ${nextColor}棋正在将军！冷静应对！`) }
-    else { setChessStatus(`⚔️ ${nextColor}棋回合`) }
-    setIsAIThinking(false)
+    const fen = chess.fen()
+    getBestMove(sf, fen, (bestMove: string) => {
+      try {
+        const move = chess.move({ from: bestMove.slice(0, 2), to: bestMove.slice(2, 4), promotion: bestMove[4] || 'q' })
+        if (move) {
+          setChessFen(chess.fen())
+          setChessHistory(prev => [...prev, move.san])
+          const nextColor = chess.turn() === 'w' ? '白' : '黑'
+          if (chess.isCheckmate()) {
+            setChessStatus(`${nextColor}棋获胜！✨`)
+            addSpiritMessage(`🏆 对局结束！${nextColor}棋获胜！你真棒！`)
+          } else if (chess.isCheck()) {
+            setChessStatus(`${nextColor}棋将军！`)
+            addSpiritMessage(`⚠️ ${nextColor}棋正在将军！冷静应对！`)
+          } else {
+            setChessStatus(`⚔️ ${nextColor}棋回合`)
+          }
+        }
+      } catch { /* invalid move from stockfish */ }
+      setIsAIThinking(false)
+    })
+    // fallback：1.5秒后如果 stockfish 没返回，随机走
+    setTimeout(() => {
+      if (isAIThinking) {
+        const moves = chess.moves()
+        if (moves.length > 0) {
+          const move = moves[Math.floor(Math.random() * moves.length)]
+          chess.move(move)
+          setChessFen(chess.fen())
+          setChessHistory(prev => [...prev, move])
+          setIsAIThinking(false)
+        }
+      }
+    }, 1500)
   }
 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
@@ -97,8 +180,8 @@ function App() {
           const nextColor = chess.turn() === 'w' ? '白' : '黑'
           const isCheck = chess.isCheck(); const isCapture = move.captured !== undefined; const isGameOver = chess.isCheckmate()
           if (isGameOver) { setChessStatus(move.color === 'w' ? '✨ 白棋获胜！' : '黑棋获胜！'); addSpiritMessage(`🏆 太棒了！你赢了！这盘棋下得真精彩！`) }
-          else if (isCheck) { setChessStatus(`${nextColor}棋将军！`); analyzeMove(move.san, newHistory.length, true, false, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) } }
-          else { setChessStatus(`⚔️ ${nextColor}棋回合`); analyzeMove(move.san, newHistory.length, false, isCapture, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 800) } }
+          else if (isCheck) { setChessStatus(`${nextColor}棋将军！`); analyzeMove(move.san, newHistory.length, true, false, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 100) } }
+          else { setChessStatus(`⚔️ ${nextColor}棋回合`); analyzeMove(move.san, newHistory.length, false, isCapture, false).then(msg => addSpiritMessage(msg)); if (!chess.isGameOver()) { setIsAIThinking(true); setTimeout(() => makeAIMove(), 100) } }
           return true
         }
       } catch { return false }
@@ -125,6 +208,7 @@ function App() {
   const nextPuzzle = () => { const next = (puzzleIndex + 1) % SAMPLE_PUZZLES.length; setPuzzleIndex(next); loadPuzzle(next); setPuzzleState(prev => prev ? { ...prev, step: 'try', result: 'pending', userMove: null } : null); addSpiritMessage(`📖 第${next + 1}题：${SAMPLE_PUZZLES[next].hint}`) }
   const handleSend = async () => { if (!inputText.trim()) return; const userMsg: ChatMessage = { id: Date.now(), sender: 'user', text: inputText.trim(), time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }; setMessages(prev => [...prev, userMsg]); setInputText(''); setIsAIThinking(true); const reply = await spiritChat(inputText); addSpiritMessage(reply || '让我想想...'); setIsAIThinking(false) }
   const resetChess = () => { chess.reset(); setChessFen(chess.fen()); setChessHistory([]); setChessStatus('⚔️ 执白先行'); localStorage.removeItem('chessGameState'); addSpiritMessage('🔄 对局已重新开始！加油！') }
+  const changeSkill = (level: number) => { setAiSkill(level); if (sf) setStockfishSkill(sf, level); addSpiritMessage(`⚙️ AI 难度调整为 ${level} 级`) }
 
   const currentStatus = mode === 'puzzle' ? (puzzleState ? `🎯 ${puzzleState.puzzle.theme} · ${puzzleState.puzzle.rating}` : '') : (isAIThinking ? '🤔 炭治郎思考中...' : chessStatus)
   const boardW = typeof window !== 'undefined' ? Math.min(Math.max(window.innerWidth * 0.36, 220), 480) : 400
@@ -138,11 +222,15 @@ function App() {
           <button onClick={goToChess} className={`nav-btn ${mode === 'chess' ? 'nav-active' : ''}`}>♟️ 自由对局</button>
           <button onClick={goToPuzzle} className={`nav-btn ${mode === 'puzzle' ? 'nav-active' : ''}`}>🎯 战术题库</button>
           <span className="nav-status">{currentStatus}</span>
+          {mode === 'chess' && (
+            <select className="skill-select" value={aiSkill} onChange={e => changeSkill(parseInt(e.target.value))} title="AI难度">
+              {[5, 8, 10, 13, 15, 18].map(s => <option key={s} value={s}>AI:{s}</option>)}
+            </select>
+          )}
         </div>
       </header>
 
       <div className="app-body">
-        {/* 左：棋盘 */}
         <div className="left-panel">
           <div className="board-wrap" ref={boardWrapRef}>
             <Chessboard position={chessFen} onPieceDrop={onDrop} boardWidth={boardW} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
@@ -152,7 +240,6 @@ function App() {
           )}
         </div>
 
-        {/* 中：AI对话（高度与棋盘等高） */}
         <div className="center-panel" style={{ height: boardAreaH }}>
           <div className="panel-header">💬 与炭治郎对话</div>
           <div className="chat-messages" ref={chatRef}>
@@ -171,7 +258,6 @@ function App() {
           </div>
         </div>
 
-        {/* 右：走法记录（高度与棋盘等高） */}
         <div className="right-panel" style={{ height: boardAreaH }}>
           <div className="panel-header">📜 走法记录</div>
           <div className="record-body">

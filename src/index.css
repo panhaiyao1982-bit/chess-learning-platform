@@ -77,6 +77,21 @@ html, body { height: 100%; overflow: hidden; font-family: 'PingFang SC', 'Micros
   margin-left: 4px;
 }
 
+.skill-select {
+  margin-left: 6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 0.7rem;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+}
+
+.skill-select:hover { background: rgba(255,255,255,0.14); }
+
 /* === 主体三栏 === */
 .app-body {
   display: flex;
