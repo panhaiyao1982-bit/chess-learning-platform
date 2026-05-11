@@ -2,12 +2,6 @@ import { Chess } from 'chess.js'
 import { useState, useEffect, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 
-const GUIDE_ITEMS = [
-  { icon: '♟️', title: '自由对局', desc: '与AI下棋练习' },
-  { icon: '🎯', title: '战术题库', desc: '每天挑战战术题' },
-  { icon: '💬', title: 'AI对话', desc: '向炭治郎提问' },
-  { icon: '📊', title: '积分系统', desc: '答对获得金币' }
-]
 const SAMPLE_PUZZLES = [
   { id: 1, fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', moves: ['Qf3'], theme: '双射', rating: 800, hint: '白棋先走，有什么战术？' },
   { id: 2, fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', moves: ['Bxf7+'], theme: '将军', rating: 600, hint: '用象吃 f7 的兵！' }
@@ -68,10 +62,24 @@ function App() {
   const [inputText, setInputText] = useState('')
   const [isAIThinking, setIsAIThinking] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
+  const boardWrapRef = useRef<HTMLDivElement>(null)
+  const [boardAreaH, setBoardAreaH] = useState(400)
 
   useEffect(() => {
     setMessages([{ id: Date.now(), sender: 'spirit', text: '欢迎来到孜孜国际象棋AI教练！我是炭治郎 🎌 你每走一步，我都会给你实时的建议和鼓励哦！', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) }])
     loadPuzzle(0)
+  }, [])
+
+  // 动态计算棋盘区高度，用于同步侧栏高度
+  useEffect(() => {
+    const measure = () => {
+      if (boardWrapRef.current) {
+        setBoardAreaH(boardWrapRef.current.offsetHeight)
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
   }, [])
 
   useEffect(() => {
@@ -146,18 +154,23 @@ function App() {
 
         {/* 左：棋盘+控制 */}
         <div className="left-panel">
+          {/* 第一行：重新开局 + 自由对局 + 战术题库 */}
           <div className="mode-tabs">
+            {mode === 'chess' && (
+              <button onClick={resetChess} className="btn-reset">🔄 重新开局</button>
+            )}
             <button onClick={goToChess} className={mode === 'chess' ? 'tab-active' : 'tab'}>♟️ 自由对局</button>
             <button onClick={goToPuzzle} className={mode === 'puzzle' ? 'tab-active' : 'tab'}>🎯 战术题库</button>
           </div>
+
           <div className="status-bar">{currentStatus}</div>
-          <div className="board-wrap">
+
+          {/* 棋盘（测量高度用ref） */}
+          <div className="board-wrap" ref={boardWrapRef}>
             <Chessboard position={chessFen} onPieceDrop={onDrop} boardWidth={boardW} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#3d2b1f' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
           </div>
-          <div className="action-btns">
-            {mode === 'chess' && <button onClick={resetChess} className="btn-secondary">🔄 重新开局</button>}
-            {mode === 'puzzle' && puzzleState?.result === 'correct' && <button onClick={nextPuzzle} className="btn-primary">📖 下一题</button>}
-          </div>
+
+          {/* 炭治郎头像+状态 */}
           <div className="spirit-card">
             <div className="spirit-avatar">👹</div>
             <div className="spirit-info">
@@ -165,16 +178,15 @@ function App() {
               <div className="spirit-status">{mode === 'puzzle' ? `📊 ${puzzleScore.correct}/${puzzleScore.total}` : isAIThinking ? '🤔 分析中...' : chessStatus}</div>
             </div>
           </div>
-          <div className="guide-card">
-            <div className="guide-title">📖 使用说明</div>
-            {GUIDE_ITEMS.map((item, i) => (
-              <div key={i} className="guide-item"><span className="guide-icon">{item.icon}</span><span className="guide-name">{item.title}</span><span className="guide-desc">{item.desc}</span></div>
-            ))}
-          </div>
+
+          {/* 下一题按钮（仅战术题库模式，棋盘下方） */}
+          {mode === 'puzzle' && puzzleState?.result === 'correct' && (
+            <button onClick={nextPuzzle} className="btn-primary">📖 下一题</button>
+          )}
         </div>
 
-        {/* 中：AI对话 */}
-        <div className="center-panel">
+        {/* 中：AI对话（高度与棋盘等高） */}
+        <div className="center-panel" style={{ height: boardAreaH }}>
           <div className="panel-header">💬 与炭治郎对话</div>
           <div className="chat-messages" ref={chatRef}>
             {messages.map(msg => (
@@ -192,8 +204,8 @@ function App() {
           </div>
         </div>
 
-        {/* 右：走法记录 */}
-        <div className="right-panel">
+        {/* 右：走法记录（高度与棋盘等高） */}
+        <div className="right-panel" style={{ height: boardAreaH }}>
           <div className="panel-header">📜 走法记录</div>
           <div className="record-body">
             {mode === 'puzzle' ? (
