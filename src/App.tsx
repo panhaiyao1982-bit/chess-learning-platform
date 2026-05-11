@@ -190,6 +190,9 @@ function App() {
   }
 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
+    // AI 思考中禁止用户走棋
+    if (isAIThinking) return false
+
     if (mode === 'chess') {
       try {
         const move = chess.move({ from: sourceSquare, to: targetSquare, promotion: 'q' })
